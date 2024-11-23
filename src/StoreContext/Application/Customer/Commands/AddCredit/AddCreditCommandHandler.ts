@@ -20,6 +20,6 @@ export class AddCreditCommandHandler {
             throw new Error('Customer not found');
         }
 
-        await this.addCreditService.addCredit(customer, command.amount);
+        await this.addCreditService.execute(customerId, command.credit);
     }
 }

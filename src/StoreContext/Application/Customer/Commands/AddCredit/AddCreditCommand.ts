@@ -1,3 +1,3 @@
 export class AddCreditCommand {
-    constructor(public readonly customerId: string, public readonly amount: number) {}
+    constructor(public readonly customerId: string, public readonly credit: number) {}
 }

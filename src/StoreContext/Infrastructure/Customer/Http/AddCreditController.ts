@@ -14,16 +14,16 @@ export class AddCreditController {
     }
 
     async index(req: Request, res: Response): Promise<void> {
-        const { customerId, amount } = req.body;
+        const { customerId, credit } = req.body;
 
-        if (!customerId || !amount) {
+        if (!customerId || !credit || 0 > credit) {
             res.status(400).send({ error: "Invalid request parameters" });
             return;
         }
 
         try {
             await this.commandBus.handle(
-                new AddCreditCommand(customerId, amount)
+                new AddCreditCommand(customerId, credit)
             );
 
             const customer = await this.queryBus.ask(
