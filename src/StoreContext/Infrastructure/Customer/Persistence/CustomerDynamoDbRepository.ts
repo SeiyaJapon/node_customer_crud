@@ -74,6 +74,11 @@ export class CustomerDynamoDbRepository implements CustomerRepositoryInterface {
         };
 
         const result = await this.dynamoDb.update(params).promise();
+
+        if (!result.Attributes) {
+            throw new Error('Update operation failed: Attributes are undefined');
+        }
+
         return new Customer(
             new CustomerId(result.Attributes.id),
             result.Attributes.name,

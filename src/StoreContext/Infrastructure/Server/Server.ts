@@ -15,6 +15,7 @@ import { CommandBusInterface } from '../../../SharedContext/Infrastructure/Comma
 import { QueryBusInterface } from '../../../SharedContext/Infrastructure/Query/QueryBusInterface';
 import { CommandBus } from '../../../SharedContext/Infrastructure/Command/CommandBus';
 import { QueryBus } from '../../../SharedContext/Infrastructure/Query/QueryBus';
+import {FindCustomerController} from "../Customer/Http/FindCustomerController";
 
 dotenv.config();
 const app: Application = express();
@@ -31,9 +32,9 @@ const commandBus: CommandBusInterface = new CommandBus();
 const queryBus: QueryBusInterface = new QueryBus();
 
 const createCustomerController: CreateCustomerController = new CreateCustomerController(commandBus, queryBus);
+const findCustomerController = new FindCustomerController(findCustomerService);
 
 // const listCustomersController = new ListCustomersController(customerService);
-// const getCustomerByIdController = new GetCustomerByIdController(customerService);
 // const updateCustomerController = new UpdateCustomerController(customerService);
 // const deleteCustomerController = new DeleteCustomerController(customerService);
 // const addCreditController = new AddCreditController(customerService);
@@ -47,8 +48,15 @@ app.post('/customers', async (req, res) => {
         res.status(500).json({ error: 'Error al procesar la solicitud' });
     }
 });
+app.get('/customers/:id', async (req, res) => {
+    try {
+        await findCustomerController.index(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al procesar la solicitud' });
+    }
+});
 // app.get('/customers', (req, res) => listCustomersController.listCustomers(req, res));
-// app.get('/customers/:id', (req, res) => getCustomerByIdController.getCustomerById(req, res));
 // app.put('/customers/:id', (req, res) => updateCustomerController.updateCustomer(req, res));
 // app.delete('/customers/:id', (req, res) => deleteCustomerController.deleteCustomer(req, res));
 // app.patch('/customers/:id/credit', (req, res) => addCreditController.addCredit(req, res));
