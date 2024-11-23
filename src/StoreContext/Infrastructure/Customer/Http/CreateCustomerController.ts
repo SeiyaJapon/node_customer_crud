@@ -31,9 +31,7 @@ export class CreateCustomerController {
 
             const findCustomerQuery = new FindCustomerQuery(customerId);
 
-            const result = await this.queryBus.ask(findCustomerQuery);
-
-            return result;
+            return await this.queryBus.ask(findCustomerQuery);
 
         } catch (error) {
             console.error('Error al crear o buscar el cliente:', error);

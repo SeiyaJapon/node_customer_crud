@@ -1,5 +1,4 @@
 import {FindCustomerQuery} from "./FindCustomerQuery";
-import {CustomerId} from "../../../../Domain/Customer/ValueObjects/CustomerId";
 import {FindCustomerService} from "../../../../Domain/Customer/Service/FindCustomerService";
 
 export class FindCustomerQueryHandler {
@@ -10,7 +9,6 @@ export class FindCustomerQueryHandler {
     }
 
     async handle(query: FindCustomerQuery) {
-        const customerId = new CustomerId(query.id);
-        return this.findCustomerService.execute(customerId);
+        return this.findCustomerService.execute(query.id);
     }
 }

@@ -2,14 +2,14 @@ import {QueryBusInterface} from "../../../../SharedContext/Infrastructure/Query/
 import {Response} from "express";
 import {FindAllCustomersQuery} from "../../../Application/Customer/Queries/FindAllCustomers/FindAllCustomersQuery";
 
-export class FindAllCustomerController {
+export class FindAllCustomersController {
     private queryBus: QueryBusInterface;
 
     constructor(queryBus: QueryBusInterface) {
         this.queryBus = queryBus;
     }
 
-    async findAll(res: Response) {
+    async index(res: Response) {
         try {
             const customers = await this.queryBus.ask(new FindAllCustomersQuery());
 

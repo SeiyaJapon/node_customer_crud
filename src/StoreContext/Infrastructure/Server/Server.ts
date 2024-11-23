@@ -1,8 +1,6 @@
-import express, { Application } from 'express';
+import express, { Application, Response } from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import { CreateCustomerController } from '../Customer/Http/CreateCustomerController';
-// import { ListCustomersController } from '../Customer/Http/ListCustomersController';
 // import { GetCustomerByIdController } from '../Customer/Http/GetCustomerByIdController';
 // import { UpdateCustomerController } from '../Customer/Http/UpdateCustomerController';
 // import { DeleteCustomerController } from '../Customer/Http/DeleteCustomerController';
@@ -15,7 +13,14 @@ import { CommandBusInterface } from '../../../SharedContext/Infrastructure/Comma
 import { QueryBusInterface } from '../../../SharedContext/Infrastructure/Query/QueryBusInterface';
 import { CommandBus } from '../../../SharedContext/Infrastructure/Command/CommandBus';
 import { QueryBus } from '../../../SharedContext/Infrastructure/Query/QueryBus';
-import {FindCustomerController} from "../Customer/Http/FindCustomerController";
+import { CreateCustomerController } from '../Customer/Http/CreateCustomerController';
+import { FindCustomerController } from "../Customer/Http/FindCustomerController";
+import {FindAllCustomerService} from "../../Domain/Customer/Service/FindAllCustomerService";
+import {FindAllCustomersController} from "../Customer/Http/FindAllCustomersController";
+import {UpdateCustomerService} from "../../Domain/Customer/Service/UpdateCustomerService";
+import {DeleteCustomerService} from "../../Domain/Customer/Service/DeleteCustomerService";
+import {UpdateCustomerController} from "../Customer/Http/UpdateCustomerController";
+import {DeleteCustomerController} from "../Customer/Http/DeleteCustomerController";
 
 dotenv.config();
 const app: Application = express();
@@ -27,16 +32,19 @@ const customerRepository: CustomerRepositoryInterface = new CustomerDynamoDbRepo
 
 const createCustomerService:CreateCustomerService = new CreateCustomerService(customerRepository);
 const findCustomerService:FindCustomerService = new FindCustomerService(customerRepository);
+const findAllCustomersService:FindAllCustomerService = new FindAllCustomerService(customerRepository);
+const updateCustomerService = new UpdateCustomerService(customerRepository);
+const deleteCustomerService = new DeleteCustomerService(customerRepository);
 
 const commandBus: CommandBusInterface = new CommandBus();
 const queryBus: QueryBusInterface = new QueryBus();
 
 const createCustomerController: CreateCustomerController = new CreateCustomerController(commandBus, queryBus);
-const findCustomerController = new FindCustomerController(findCustomerService);
+const findCustomerController: FindCustomerController = new FindCustomerController(queryBus);
+const findAllCustomersController: FindAllCustomersController = new FindAllCustomersController(queryBus);
+const updateCustomerController: UpdateCustomerController = new UpdateCustomerController(commandBus, queryBus);
+const deleteCustomerController: DeleteCustomerController = new DeleteCustomerController(commandBus);
 
-// const listCustomersController = new ListCustomersController(customerService);
-// const updateCustomerController = new UpdateCustomerController(customerService);
-// const deleteCustomerController = new DeleteCustomerController(customerService);
 // const addCreditController = new AddCreditController(customerService);
 
 app.post('/customers', async (req, res) => {
@@ -56,9 +64,31 @@ app.get('/customers/:id', async (req, res) => {
         res.status(500).json({ error: 'Error al procesar la solicitud' });
     }
 });
-// app.get('/customers', (req, res) => listCustomersController.listCustomers(req, res));
-// app.put('/customers/:id', (req, res) => updateCustomerController.updateCustomer(req, res));
-// app.delete('/customers/:id', (req, res) => deleteCustomerController.deleteCustomer(req, res));
+app.get('/customers', async (res: Response) => {
+    try {
+        await findAllCustomersController.index(res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al procesar la solicitud' });
+    }
+});
+app.put('/customers/:id', async (req, res) => {
+    try {
+        await updateCustomerController.index(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al procesar la solicitud' });
+    }
+});
+app.delete('/customers/:id', async (req, res) => {
+    try {
+        await deleteCustomerController.index(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al procesar la solicitud' });
+    }
+});
+
 // app.patch('/customers/:id/credit', (req, res) => addCreditController.addCredit(req, res));
 
 app.listen(port, () => {
