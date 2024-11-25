@@ -1,5 +1,4 @@
 import { CustomerRepositoryInterface } from "../Repositories/CustomerRepositoryInterface";
-import { Customer } from "../Customer";
 import {CustomerId} from "../ValueObjects/CustomerId";
 
 export class AddCreditService {
