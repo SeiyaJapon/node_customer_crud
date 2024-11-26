@@ -1,0 +1,97 @@
+service: customer-management
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    DYNAMODB_TABLE: Customers
+
+functions:
+  createCustomer:
+    handler: src/controllers/CreateCustomerController.handler
+    events:
+      - http:
+          path: customers
+          method: post
+          cors: true
+
+  updateCustomer:
+    handler: src/controllers/UpdateCustomerController.handler
+    events:
+      - http:
+          path: customers/{id}
+          method: put
+          cors: true
+
+  deleteCustomer:
+    handler: src/controllers/DeleteCustomerController.handler
+    events:
+      - http:
+          path: customers/{id}
+          method: delete
+          cors: true
+
+  getCustomer:
+    handler: src/controllers/GetCustomerController.handler
+    events:
+      - http:
+          path: customers/{id}
+          method: get
+          cors: true
+
+  listCustomers:
+    handler: src/controllers/ListCustomersController.handler
+    events:
+      - http:
+          path: customers
+          method: get
+          cors: true
+
+  searchCustomer:
+    handler: src/controllers/SearchCustomerController.handler
+    events:
+      - http:
+          path: customers/search
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    CustomerTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Customers
+        AttributeDefinitions:
+          - AttributeName: "id"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+
+  Outputs:
+    CustomerTableName:
+      Description: "Name of the DynamoDB Table"
+      Value: !Ref CustomerTable
+
+iamRoleStatements:
+  - Effect: "Allow"
+    Action:
+      - "dynamodb:PutItem"
+      - "dynamodb:GetItem"
+      - "dynamodb:UpdateItem"
+      - "dynamodb:DeleteItem"
+    Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:resources.Resources.CustomerTable.Properties.TableName}"
+  - Effect: "Allow"
+    Action:
+      - "logs:CreateLogGroup"
+      - "logs:CreateLogStream"
+      - "logs:PutLogEvents"
+    Resource: "*"
+
+plugins:
+  - serverless-offline

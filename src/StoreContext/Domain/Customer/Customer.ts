@@ -40,7 +40,11 @@ export class Customer {
         this._availableCredit = value;
     }
 
-    addCredit(amount: number): void {
-        this.availableCredit += amount;
+    addCredit(credit: number): void {
+        if (credit <= 0) {
+            throw new Error("Credit must be a positive number.");
+        }
+        
+        this.availableCredit += credit;
     }
 }
